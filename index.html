@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom YouTube Playlist Widget</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      text-align: center;
+    }
+    .widget-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      max-width: 600px;
+    }
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    input[type="text"] {
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #A17E89;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #8c6375;
+    }
+    iframe {
+      width: 100%;
+      height: 315px;
+      border: none;
+    }
+    .player-controls {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+    .button img {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Custom YouTube Playlist</h1>
+  <div class="widget-container">
+    <div class="input-container">
+      <input type="text" id="playlist-link" placeholder="Paste YouTube Playlist Link">
+      <button id="load-playlist">Load Playlist</button>
+    </div>
+    <iframe id="youtube-player" allow="autoplay"></iframe>
+    <div class="player-controls">
+      <div class="button" id="prev">
+        <img src="https://i.ibb.co/wBfRjYN/b09740b5-0390-4a3b-9272-48f3a364a875.png" alt="Previous">
+      </div>
+      <div class="button" id="play-pause">
+        <img src="https://i.ibb.co/Vvw3mF3/9881a73d-f40d-4ffa-9a2a-c58c093cd1c2.png" alt="Play">
+      </div>
+      <div class="button" id="next">
+        <img src="https://i.ibb.co/Thh3gWS/e35e9d38-5ec9-4967-b7bf-16b081522ddc.png" alt="Next">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const playlistLinkInput = document.getElementById("playlist-link");
+    const loadPlaylistButton = document.getElementById("load-playlist");
+    const player = document.getElementById("youtube-player");
+    const playPauseButton = document.getElementById("play-pause");
+    const prevButton = document.getElementById("prev");
+    const nextButton = document.getElementById("next");
+
+    let playlist = [];
+    let currentIndex = 0;
+    let isPlaying = false;
+
+    function extractPlaylistID(url) {
+      const regex = /[?&]list=([^&]+)/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+
+    function loadPlaylist() {
+      const url = playlistLinkInput.value.trim();
+      const playlistID = extractPlaylistID(url);
+      if (playlistID) {
+        playlist = [`https://www.youtube.com/embed/videoseries?list=${playlistID}`];
+        currentIndex = 0;
+        updatePlayer();
+      } else {
+        alert("Invalid YouTube Playlist Link!");
+      }
+    }
+
+    function updatePlayer() {
+      player.src = `${playlist[currentIndex]}&autoplay=1&controls=0`;
+      isPlaying = true;
+      playPauseButton.querySelector("img").src = "https://i.ibb.co/C09TGNH/3ec3e92e-9460-43f1-963c-bbfb8e6a0cc8.png"; // Pausa
+    }
+
+    playPauseButton.addEventListener("click", () => {
+      if (isPlaying) {
+        player.src = ""; // Ferma il video
+        isPlaying = false;
+        playPauseButton.querySelector("img").src = "https://i.ibb.co/Vvw3mF3/9881a73d-f40d-4ffa-9a2a-c58c093cd1c2.png"; // Play
+      } else {
+        updatePlayer(); // Riproduce il video corrente
+      }
+    });
+
+    nextButton.addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % playlist.length; // Prossimo video
+      updatePlayer();
+    });
+
+    prevButton.addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + playlist.length) % playlist.length; // Video precedente
+      updatePlayer();
+    });
+
+    loadPlaylistButton.addEventListener("click", loadPlaylist);
+  </script>
+</body>
+</html>
